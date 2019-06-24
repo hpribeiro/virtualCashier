@@ -50,7 +50,7 @@ export const update = ({ bodymen: { body }, params, user }, res, next) =>
       }
       return result
     })
-    .then((user) => user ? Object.assign(user, body).save() : null)
+    .then((user) => user ? ({...user, ...body}).save() : null)
     .then((user) => user ? user.view(true) : null)
     .then(success(res))
     .catch(next)

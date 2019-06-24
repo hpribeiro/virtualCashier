@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { master } from '../../services/passport'
-import { create, index, show, update, destroy } from './controller'
+import { create, index, show, update, destroy, resume } from './controller'
 import { schema } from './model'
 export Operations, { schema } from './model'
 
@@ -92,5 +92,18 @@ router.put(
  * @apiError 401 master access only.
  */
 router.delete('/:id', master(), destroy)
+
+/**
+ * @api {get} /operations Retrieve operations
+ * @apiName RetrieveOperations
+ * @apiGroup Operations
+ * @apiPermission master
+ * @apiParam {String} access_token master access token.
+ * @apiUse listParams
+ * @apiSuccess {Object[]} operations List of operations.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 401 master access only.
+ */
+router.get('/resume/', master(), query(), resume)
 
 export default router

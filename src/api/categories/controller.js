@@ -23,7 +23,7 @@ export const show = ({ params }, res, next) =>
 export const update = ({ bodymen: { body }, params }, res, next) =>
   Categories.findById(params.id)
     .then(notFound(res))
-    .then((categories) => categories ? Object.assign(categories, body).save() : null)
+    .then((categories) => categories ? ({...categories, ...body}).save() : null)
     .then((categories) => categories ? categories.view(true) : null)
     .then(success(res))
     .catch(next)
