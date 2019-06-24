@@ -1,11 +1,27 @@
 import { success, notFound } from '../../services/response/'
 import { Operations } from '.'
+import { findCategoryByName } from '../categories/controller'
 
-export const create = ({ bodymen: { body } }, res, next) =>
-  Operations.create(body)
+export const create = ({ bodymen: { body } }, res, next) => {
+  return Promise.resolve()
+    .then(() => {
+      let promises = body.categories.map(category => findCategoryByName(category))
+      return Promise.all(promises)
+    })
+    .then((categories) => {
+      const error = categories.find(category => category instanceof Error)
+      if (error) return Promise.reject(error)
+    })
+    .then((categories) => categories.map(category => ({_id: category._id, name: category.name})))
+    .then((categories) => {
+      let operationBody = {...body}
+      operationBody.categories = [...categories]
+      return Operations.create(operationBody)
+    })
     .then((operations) => operations.view(true))
     .then(success(res, 201))
     .catch(next)
+}
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   Operations.find(query, select, cursor)
