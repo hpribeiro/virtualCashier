@@ -5,7 +5,8 @@ const operationsSchema = new Schema({
     type: String
   },
   type: {
-    type: String
+    type: Number,
+    enum: [-1, 1]
   },
   description: {
     type: String
