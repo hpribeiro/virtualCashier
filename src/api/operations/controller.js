@@ -1,6 +1,12 @@
+import { Decimal } from 'decimal.js-light'
 import { success, notFound } from '../../services/response/'
 import { Operations } from '.'
-import { findCategoryByName } from '../categories/controller'
+import { Categories } from '../categories'
+
+const findCategoryByName = (name) =>
+  Categories.find({name})
+    .lean()
+    .exec()
 
 export const create = ({ bodymen: { body } }, res, next) => {
   return Promise.resolve()
@@ -63,8 +69,10 @@ export const resume = ({ querymen: { query, select, cursor } }, res, next) => {
     .then((operations) => operations.map((operations) => operations.view()))
     .then((operations) => {
       const totalBalance = operations
-        .map((operation) => operation.value)
-        .reduce((accumulator, currentValue) => accumulator + currentValue)
+        .map((operation) => new Decimal(operation.value).times(operation.type))
+        .reduce((accumulator, currentValue) => currentValue.add(accumulator))
+        .todp(2)
+        .toNumber()
       Promise.resolve({
         operations,
         totalBalance
