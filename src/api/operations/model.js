@@ -1,9 +1,9 @@
 import mongoose, { Schema } from 'mongoose'
 
 const operationsSchema = new Schema({
-  categories: {
+  categories: [{
     type: String
-  },
+  }],
   type: {
     type: Number,
     enum: [-1, 1]
@@ -12,10 +12,12 @@ const operationsSchema = new Schema({
     type: String
   },
   value: {
-    type: Number
+    type: Number,
+    required: true
   },
   currency: {
-    type: String
+    type: String,
+    required: true
   }
 }, {
   timestamps: true,

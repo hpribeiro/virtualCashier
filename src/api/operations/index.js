@@ -46,6 +46,17 @@ router.post(
 router.get('/', master(), query(), index)
 
 /**
+ * @api {get} /operations/resume Retrieve operations resume
+ * @apiName RetrieveOperationsResume
+ * @apiGroup Operations
+ * @apiPermission master
+ * @apiParam {String} access_token master access token.
+ * @apiSuccess {Object} resume operations of current day.
+ * @apiError 401 master access only.
+ */
+router.get('/resume', master(), resume)
+
+/**
  * @api {get} /operations/:id Retrieve operations
  * @apiName RetrieveOperations
  * @apiGroup Operations
@@ -92,18 +103,5 @@ router.put(
  * @apiError 401 master access only.
  */
 router.delete('/:id', master(), destroy)
-
-/**
- * @api {get} /operations Retrieve operations
- * @apiName RetrieveOperations
- * @apiGroup Operations
- * @apiPermission master
- * @apiParam {String} access_token master access token.
- * @apiUse listParams
- * @apiSuccess {Object[]} operations List of operations.
- * @apiError {Object} 400 Some parameters may contain invalid values.
- * @apiError 401 master access only.
- */
-router.get('/resume/', master(), query(), resume)
 
 export default router

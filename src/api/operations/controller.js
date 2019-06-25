@@ -4,26 +4,26 @@ import { Operations } from '.'
 import { Categories } from '../categories'
 
 const findCategoryByName = (name) =>
-  Categories.find({name})
+  Categories.findOne({name})
     .lean()
     .exec()
 
+const findAllCategories = (categories) => Promise.resolve()
+  .then(() => {
+    let promises = categories.map(category => findCategoryByName(category))
+    return Promise.all(promises)
+  })
+
+const verifyIfAllCategoriesExists = (categories) => {
+  const categoriesNotFound = categories.filter(category => !category).length > 0
+  const error = categories.find(category => category instanceof Error)
+  if (error || categoriesNotFound) return Promise.reject(error)
+}
+
 export const create = ({ bodymen: { body } }, res, next) => {
-  return Promise.resolve()
-    .then(() => {
-      let promises = body.categories.map(category => findCategoryByName(category))
-      return Promise.all(promises)
-    })
-    .then((categories) => {
-      const error = categories.find(category => category instanceof Error)
-      if (error) return Promise.reject(error)
-    })
-    .then((categories) => categories.map(category => ({_id: category._id, name: category.name})))
-    .then((categories) => {
-      let operationBody = {...body}
-      operationBody.categories = [...categories]
-      return Operations.create(operationBody)
-    })
+  return findAllCategories(body.categories)
+    .then(verifyIfAllCategoriesExists)
+    .then(() => Operations.create(body))
     .then((operations) => operations.view(true))
     .then(success(res, 201))
     .catch(next)
@@ -57,15 +57,14 @@ export const destroy = ({ params }, res, next) =>
     .then(success(res, 204))
     .catch(next)
 
-export const resume = ({ querymen: { query, select, cursor } }, res, next) => {
-  query = {
-    $where: () => {
+export const resume = ({ params }, res, next) =>
+  Operations.find({
+    $where: function () {
       let today = new Date()
       today.setHours(0, 0, 0, 0)
       return (this._id.getTimestamp() >= today)
     }
-  }
-  return Operations.find(query, select, cursor)
+  })
     .then((operations) => operations.map((operations) => operations.view()))
     .then((operations) => {
       const totalBalance = operations
@@ -73,11 +72,10 @@ export const resume = ({ querymen: { query, select, cursor } }, res, next) => {
         .reduce((accumulator, currentValue) => currentValue.add(accumulator))
         .todp(2)
         .toNumber()
-      Promise.resolve({
+      return {
         operations,
         totalBalance
-      })
+      }
     })
     .then(success(res))
     .catch(next)
-}

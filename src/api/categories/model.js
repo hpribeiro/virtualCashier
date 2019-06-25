@@ -2,10 +2,14 @@ import mongoose, { Schema } from 'mongoose'
 
 const categoriesSchema = new Schema({
   name: {
-    type: String
+    type: String,
+    required: true,
+    trim: true,
+    unique: true
   },
   description: {
-    type: String
+    type: String,
+    trim: true
   }
 }, {
   timestamps: true,
