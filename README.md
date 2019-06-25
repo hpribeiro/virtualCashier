@@ -5,10 +5,10 @@ store.
 Normal work flow:
 - Create Category;
 - Register a operation with this fields:
- - Value;
- - Type: 1 for input / -1 for output;
- - Categories: Array of categories;
- - Currency: just a string field;
+  - Value;
+  - Type: 1 for input / -1 for output;
+  - Categories: Array of categories;
+  - Currency: just a string field;
 - See Resume of current day operations and balance;
 
 See the API's [documentation](DOCS.md).
