@@ -34,8 +34,3 @@ export const destroy = ({ params }, res, next) =>
     .then((categories) => categories ? categories.remove() : null)
     .then(success(res, 204))
     .catch(next)
-
-export const findCategoryByName = (name) =>
-  Categories.find({name})
-    .lean()
-    .exec()
